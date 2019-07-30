@@ -12,6 +12,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+
+
 public class CreateEventActivity extends AppCompatActivity {
     Button post;
     EditText title,numberpeople;
@@ -26,16 +28,30 @@ public class CreateEventActivity extends AppCompatActivity {
         post.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick (View view) {
-                String titleValue=title.getText ().toString ();
-                int number=Integer.parseInt ( numberpeople.getText ().toString () );
+                String titleValue=title.getText ().toString ().trim ();
+                String number=numberpeople.getText ().toString ().trim ();
+
                 FirebaseUser user= FirebaseAuth.getInstance ().getCurrentUser ();
                 if(user!=null){
+FirebaseDatabase database=FirebaseDatabase.getInstance ();
+FirebaseAuth firebaseAuth=FirebaseAuth.getInstance ();
 
 
-                    DatabaseReference reference= FirebaseDatabase.getInstance ().getReference ("Posts").child ( user.getUid () );
 
-                    reference.child ( "Title" ).setValue ( titleValue );
-                    reference.child ( "Number of people" ).setValue ( number );
+                    DatabaseReference reference=FirebaseDatabase.getInstance ().getReference ("Posts");
+
+
+                     String id=reference.push ().getKey ();
+                     Event eventinfo=new Event ( titleValue,user.getUid (),number );
+                     reference.child ( id ).setValue ( eventinfo );
+
+
+
+
+
+
+
+
 
 
 

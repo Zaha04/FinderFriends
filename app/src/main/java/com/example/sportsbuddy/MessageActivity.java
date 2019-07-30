@@ -31,93 +31,93 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MessageActivity extends AppCompatActivity {
-    TextView username;
-    FirebaseUser fuser;
-    DatabaseReference reference;
-    Intent intent;
-    ImageButton btn_send;
-    EditText text_send;
-    MessageAdapter messageAdapter;
-    List<Chat> mchat;
-    RecyclerView recyclerView;
+  TextView username;
+  FirebaseUser fuser;
+  DatabaseReference reference;
+  Intent intent;
+  ImageButton btn_send;
+  EditText text_send;
+  MessageAdapter messageAdapter;
+  List<Chat> mchat;
+  RecyclerView recyclerView;
 
-    @Override
-    protected void onCreate (Bundle savedInstanceState) {
-        super.onCreate ( savedInstanceState );
-        setContentView ( R.layout.activity_message );
-        btn_send=findViewById ( R.id.btn_send );
-        text_send=findViewById ( R.id.editText );
-        recyclerView=findViewById ( R.id.recycler_view1 );
-        recyclerView.setHasFixedSize ( true );
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager ( getApplicationContext () );
+  @Override
+  protected void onCreate (Bundle savedInstanceState) {
+    super.onCreate ( savedInstanceState );
+    setContentView ( R.layout.activity_message );
+    btn_send=findViewById ( R.id.btn_send );
+    text_send=findViewById ( R.id.editText );
+    recyclerView=findViewById ( R.id.recycler_view1 );
+    recyclerView.setHasFixedSize ( true );
+    LinearLayoutManager linearLayoutManager=new LinearLayoutManager ( getApplicationContext () );
 
-        recyclerView.setLayoutManager ( linearLayoutManager );
-
-
+    recyclerView.setLayoutManager ( linearLayoutManager );
 
 
 
 
 
-            username=findViewById ( R.id.username6 );
 
 
-            intent=getIntent ();
-
-           final String userId=intent.getStringExtra ( "userid" );
+    username=findViewById ( R.id.username6 );
 
 
+    intent=getIntent ();
 
-
-        fuser= FirebaseAuth.getInstance ().getCurrentUser ();
-        reference= FirebaseDatabase.getInstance ().getReference ("users");
-        reference.addValueEventListener ( new ValueEventListener () {
-            @Override
-            public void onDataChange (@NonNull DataSnapshot dataSnapshot) {
+    final String userId=intent.getStringExtra ( "userid" );
 
 
 
-                for(DataSnapshot snapshot:dataSnapshot.getChildren ()){
-                    User user=snapshot.getValue (User.class);
 
-
-                    assert user!=null;
-                    assert fuser!=null;
-                    if(!fuser.getUid ().equals ( user.getFirstName () )){
-                        username.setText ( user.getFirstName () );
+    fuser= FirebaseAuth.getInstance ().getCurrentUser ();
+    reference= FirebaseDatabase.getInstance ().getReference ("users");
+    reference.addValueEventListener ( new ValueEventListener () {
+      @Override
+      public void onDataChange (@NonNull DataSnapshot dataSnapshot) {
 
 
 
-                    }
-
-                }
-
-readMessages ( fuser.getUid (),userId );
-            }
-
-            @Override
-            public void onCancelled (@NonNull DatabaseError databaseError) {
-
-            }
-        } );
+        for(DataSnapshot snapshot:dataSnapshot.getChildren ()){
+          User user=snapshot.getValue (User.class);
 
 
-        btn_send.setOnClickListener ( new View.OnClickListener () {
-            @Override
-            public void onClick (View view) {
-                String msg=text_send.getText ().toString ();
-                if(!msg.equals ( "" )){
-                    sendMessage ( fuser.getUid (),userId,msg );
-                } else{
-                    Toast.makeText ( MessageActivity.this,"You can't send empty",Toast.LENGTH_SHORT ).show ();
-                }
-                text_send.setText ( "" );
-            }
+          assert user!=null;
+          assert fuser!=null;
+          if(!fuser.getUid ().equals ( user.getFirstName () )){
+            username.setText ( user.getFirstName () );
 
-        } );
+
+
+          }
+
         }
-private void sendMessage(String sender, String receiver, String message)
-{
+
+        readMessages ( fuser.getUid (),userId );
+      }
+
+      @Override
+      public void onCancelled (@NonNull DatabaseError databaseError) {
+
+      }
+    } );
+
+
+    btn_send.setOnClickListener ( new View.OnClickListener () {
+      @Override
+      public void onClick (View view) {
+        String msg=text_send.getText ().toString ();
+        if(!msg.equals ( "" )){
+          sendMessage ( fuser.getUid (),userId,msg );
+        } else{
+          Toast.makeText ( MessageActivity.this,"You can't send empty",Toast.LENGTH_SHORT ).show ();
+        }
+        text_send.setText ( "" );
+      }
+
+    } );
+  }
+  private void sendMessage(String sender, String receiver, String message)
+  {
     DatabaseReference reference=FirebaseDatabase.getInstance ().getReference ();
     HashMap<String,Object> hashMap=new HashMap<> (  );
     hashMap.put ( "sender",sender );
@@ -125,32 +125,31 @@ private void sendMessage(String sender, String receiver, String message)
     hashMap.put ( "message",message );
     reference.child ( "Chats" ).push ().setValue ( hashMap );
 
-}
-private void readMessages(final String myid, final String userId)
-{
+  }
+  private void readMessages(final String myid, final String userId)
+  {
     mchat=new ArrayList<> (  );
     reference=FirebaseDatabase.getInstance ().getReference ("Chats");
     reference.addValueEventListener ( new ValueEventListener () {
-        @Override
-        public void onDataChange (@NonNull DataSnapshot dataSnapshot) {
-            mchat.clear ();
-            for(DataSnapshot snapshot:dataSnapshot.getChildren ()){
-                Chat chat=snapshot.getValue (Chat.class);
+      @Override
+      public void onDataChange (@NonNull DataSnapshot dataSnapshot) {
+        mchat.clear ();
+        for(DataSnapshot snapshot:dataSnapshot.getChildren ()){
+          Chat chat=snapshot.getValue (Chat.class);
 
 
-                if(chat.getReceiver ().equals ( myid )&& chat.getSender ().equals ( userId) || chat.getReceiver ().equals ( userId )&& chat.getSender ().equals ( myid )) {
-                    mchat.add ( chat );
-                }
-                messageAdapter=new MessageAdapter ( MessageActivity.this,mchat );
-                recyclerView.setAdapter ( messageAdapter );
-            }
+          if(chat.getReceiver ().equals ( myid )&& chat.getSender ().equals ( userId) || chat.getReceiver ().equals ( userId )&& chat.getSender ().equals ( myid )) {
+            mchat.add ( chat );
+          }
+          messageAdapter=new MessageAdapter ( MessageActivity.this,mchat );
+          recyclerView.setAdapter ( messageAdapter );
         }
+      }
 
-        @Override
-        public void onCancelled (@NonNull DatabaseError databaseError) {
+      @Override
+      public void onCancelled (@NonNull DatabaseError databaseError) {
 
-        }
+      }
     } );
+  }
 }
-    }
-

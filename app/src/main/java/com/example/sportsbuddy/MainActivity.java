@@ -20,7 +20,7 @@ private Button runner;
 private Button profile;
 private Button message;
 private Button userlist;
-private Button location,create_event;
+private Button location,create_event,eventlist;
 
     private FirebaseAuth auth;
     private FirebaseUser user;
@@ -34,6 +34,15 @@ private Button location,create_event;
         logout=(Button)findViewById ( R.id.logout ) ;
         details=(Button)findViewById ( R.id.user );
         create_event=findViewById ( R.id.create_event );
+        eventlist=findViewById ( R.id.listevent );
+        eventlist.setOnClickListener ( new View.OnClickListener () {
+            @Override
+            public void onClick (View view) {
+                Intent intent=new Intent ( MainActivity.this,ListEventActivity.class );
+                startActivity ( intent );
+
+            }
+        } );
 
         userlist=(Button) findViewById ( R.id.userlist );
         location=findViewById ( R.id.location );
